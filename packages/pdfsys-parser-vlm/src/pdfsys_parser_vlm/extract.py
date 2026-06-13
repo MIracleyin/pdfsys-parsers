@@ -73,9 +73,22 @@ class VlmParser:
         self._base_url: str | None = None
 
     def _ensure_server(self) -> str:
-        """Lazy-start the mineru-api subprocess; return its base URL."""
+        """Lazy-start the mineru-api subprocess; return its base URL.
+
+        When ``MINERU_VLM_URL`` is set in the environment, the client
+        connects to that URL directly and skips the subprocess
+        lifecycle (used by container deployments where a sibling
+        service hosts mineru-api).
+        """
         if self._base_url is not None:
             return self._base_url
+
+        external = os.environ.get("MINERU_VLM_URL")
+        if external:
+            base = external.rstrip("/")
+            _LOG.info("using external mineru-api (vlm) at %s", base)
+            self._base_url = base
+            return base
 
         bin_path = _resolve_mineru_api_bin()
         port = _pick_free_port()

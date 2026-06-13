@@ -67,6 +67,17 @@ class PipelineParser:
         if self._base_url is not None:
             return self._base_url
 
+        # External server: when MINERU_PIPELINE_URL is set, point the
+        # client at an existing mineru-api (e.g. a sibling container in
+        # docker-compose) and skip the subprocess lifecycle entirely.
+        # `close()` becomes a no-op because `self._proc` stays None.
+        external = os.environ.get("MINERU_PIPELINE_URL")
+        if external:
+            base = external.rstrip("/")
+            _LOG.info("using external mineru-api (pipeline) at %s", base)
+            self._base_url = base
+            return base
+
         bin_path = _resolve_mineru_api_bin()
         port = _pick_free_port()
         _LOG.info("starting mineru-api (pipeline) at 127.0.0.1:%d", port)

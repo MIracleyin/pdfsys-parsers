@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pdfsys-parser-vlm"
-version = "0.2.0"
+version = "0.3.0"
 description = "VLM backend: out-of-process HTTP client to mineru-api (vlm-<engine>)."
 requires-python = ">=3.11"
 dependencies = [
