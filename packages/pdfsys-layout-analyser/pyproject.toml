@@ -8,7 +8,7 @@ version = "0.0.1"
 description = "Layout model runner: emits LayoutDocument to cache, runs once per PDF on the needs-ocr branch."
 requires-python = ">=3.11"
 dependencies = [
-    "pdfsys-core",
+    "pdfsys-types",
     "pymupdf>=1.25",
     "doclayout-yolo>=0.0.2",
     "numpy>=1.24",
@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-pdfsys-core = { workspace = true }
+pdfsys-types = { workspace = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pdfsys_layout_analyser"]

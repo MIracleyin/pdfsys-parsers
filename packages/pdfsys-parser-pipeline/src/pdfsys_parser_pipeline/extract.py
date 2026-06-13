@@ -27,7 +27,7 @@ from typing import Any
 
 import httpx
 
-from pdfsys_core import Backend, ExtractedDoc, PipelineConfig
+from pdfsys_types import Backend, ExtractedDoc, PipelineConfig
 
 _LOG = logging.getLogger(__name__)
 

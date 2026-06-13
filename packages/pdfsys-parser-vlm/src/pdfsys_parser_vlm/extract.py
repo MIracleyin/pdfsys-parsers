@@ -34,7 +34,7 @@ from typing import Any
 
 import httpx
 
-from pdfsys_core import Backend, ExtractedDoc, VlmConfig
+from pdfsys_types import Backend, ExtractedDoc, VlmConfig
 
 _LOG = logging.getLogger(__name__)
 

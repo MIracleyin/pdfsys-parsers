@@ -7,8 +7,8 @@ which is why the router routes here only when the XGBoost classifier says
 
 We use ``page.get_text("blocks")`` which returns paragraph-shaped blocks
 with coordinates already in reading order (PyMuPDF's internal sorting).
-Each block becomes one :class:`pdfsys_core.Segment` of type
-:attr:`pdfsys_core.RegionType.TEXT`, with its bbox normalized to ``[0, 1]``.
+Each block becomes one :class:`pdfsys_types.Segment` of type
+:attr:`pdfsys_types.RegionType.TEXT`, with its bbox normalized to ``[0, 1]``.
 Empty and image-only blocks are dropped.
 
 No layout-model dependency, no GPU, no OCR — this is the text-ok fast
@@ -28,7 +28,7 @@ import pymupdf
 # annotations") that are benign but flood stderr on certain PDFs.
 pymupdf.TOOLS.mupdf_display_warnings(False)
 
-from pdfsys_core import (
+from pdfsys_types import (
     Backend,
     BBox,
     ExtractedDoc,

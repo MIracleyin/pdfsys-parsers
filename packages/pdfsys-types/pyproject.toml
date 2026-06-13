@@ -1,0 +1,13 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pdfsys-types"
+version = "0.1.0"
+description = "Pure-type contracts vendored from pdfsys-core. Zero runtime deps."
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pdfsys_types"]

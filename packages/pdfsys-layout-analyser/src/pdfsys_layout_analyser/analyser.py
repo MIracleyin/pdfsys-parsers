@@ -23,7 +23,7 @@ import hashlib
 from pathlib import Path
 from typing import Any, Protocol
 
-from pdfsys_core import (
+from pdfsys_types import (
     BBox,
     LayoutConfig,
     LayoutDocument,
