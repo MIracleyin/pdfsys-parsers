@@ -74,6 +74,7 @@ class PipelineConfig:
     table_enable: bool = True                     # do_parse(table_enable=...)
     p_lang: str = "ch"                            # do_parse(p_lang_list=[p_lang])
     output_dir: Path | None = None                # None = use tmpdir, delete after
+    return_images: bool = True                    # fetch figure crops back over HTTP
 
 
 @dataclass(slots=True)
@@ -94,6 +95,7 @@ class VlmConfig:
     table_enable: bool = True                     # do_parse(table_enable=...)
     p_lang: str = "ch"                            # do_parse(p_lang_list=[p_lang])
     output_dir: Path | None = None                # None = use tmpdir, delete after
+    return_images: bool = True                    # fetch figure crops back over HTTP
 
 
 @dataclass(slots=True)
