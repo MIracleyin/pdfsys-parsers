@@ -13,10 +13,12 @@ The lifecycle mirrors :mod:`pdfsys_parser_vlm.extract`.
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -135,7 +137,7 @@ class PipelineParser:
                     "return_middle_json": "true",
                     "return_content_list": "true",
                     "return_layout_pdf": "false",
-                    "return_images": "false",
+                    "return_images": str(self.config.return_images).lower(),
                 },
                 timeout=_EXTRACT_TIMEOUT_S,
             )
@@ -177,6 +179,9 @@ class PipelineParser:
             self.config.output_dir,
             sha,
             f"{sha}_content_list.json",
+        )
+        stats["images_written"] = _persist_images(
+            result.get("images"), self.config.output_dir, sha
         )
 
         return ExtractedDoc(
@@ -221,3 +226,46 @@ def _persist_sidecar(
     text = payload if isinstance(payload, str) else json.dumps(payload, ensure_ascii=False)
     out_path.write_text(text, encoding="utf-8")
     return str(out_path.relative_to(output_dir))
+
+
+#: mineru-api returns each crop as ``data:<mime>;base64,<payload>``.
+_DATA_URI_RE = re.compile(r"^data:[^;,]+;base64,(?P<payload>.*)$", re.DOTALL)
+
+
+def _persist_images(
+    images: Any,
+    output_dir: Path | None,
+    sha: str,
+) -> int:
+    """Write the returned figure crops to ``<output_dir>/<sha>/images/``.
+
+    That is the layout ``content_list.json`` already refers to — its image
+    entries carry ``img_path`` values like ``images/<hash>.jpg`` relative to
+    the document directory — so writing them here is what makes those
+    references resolve. Without this the crops exist only inside the
+    mineru-api process's own filesystem, which in a container deployment is
+    not the one the client can read.
+
+    Returns the number of files written.
+    """
+    if output_dir is None or not isinstance(images, dict) or not images:
+        return 0
+    out_dir = Path(output_dir) / sha / "images"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written = 0
+    for name, uri in images.items():
+        match = _DATA_URI_RE.match(uri) if isinstance(uri, str) else None
+        if match is None:
+            _LOG.warning("skipping crop %r: not a base64 data URI", name)
+            continue
+        # Basename only: the filename comes from the server, and a crop is
+        # never worth letting a path escape the output directory.
+        try:
+            (out_dir / Path(str(name)).name).write_bytes(
+                base64.b64decode(match.group("payload"))
+            )
+        except (OSError, ValueError) as e:
+            _LOG.warning("skipping crop %r: %s", name, e)
+            continue
+        written += 1
+    return written
